@@ -1,1 +1,1 @@
-# Generate-Music-in-Time-Series
+# Generate Music in Time Series
