@@ -174,29 +174,33 @@ def generate_symbol(melody_length):
     return "./output/melody.png", "./output/melody.wav"
 
 with gr.Blocks(title="Generate music in time series") as music_generation:
-    gr.Markdown("""
+  gr.Markdown("""
     # Generate music in time series
     """)
+  with gr.Box():
+    with gr.Column():
+      with gr.Row():
+        symbol = gr.Dropdown(choices = name_pitch_list, label="Pitch of note")
+        duration = gr.Dropdown(choices = acceptable_durations, label="Duration of note")
+      
+      seed_melody = gr.Textbox(value = "60 _ _ _ _ 62 _ _ _ _ 64 _ _ _ _ 65 _ _ _ _ 67 _ _ _ _ ",label="Seed melody")
 
-    with gr.Row():
-      symbol = gr.Dropdown(choices = name_pitch_list, label="Pitch of note")
-      duration = gr.Dropdown(choices = acceptable_durations, label="Duration of note")
-    seed_melody = gr.Textbox(value = "60 _ _ _ _ 62 _ _ _ _ 64 _ _ _ _ 65 _ _ _ _ 67 _ _ _ _ ",label="Seed melody")
+      with gr.Row():
+        add_symbol_btn = gr.Button(value="Add symbol")
+        clear_symbol_btn = gr.Button(value="Clear symbol")
 
-    with gr.Row():
-      add_symbol_btn = gr.Button(value="Add symbol")
-      clear_symbol_btn = gr.Button(value="Clear symbol")
-
-    add_symbol_btn.click(fn=add_symbol, inputs=[symbol, duration], outputs=seed_melody)
-    clear_symbol_btn.click(fn = clear_symbol, outputs=seed_melody)
-
-    with gr.Row():
-      melody_length = gr.Slider(minimum=100, maximum=1000, label="Melody length")
-      generate_btn = gr.Button(value="Generate melody")
-    
-    with gr.Row():
-      melody_image = gr.Image(label="Melody sheet")
-      melody_audio = gr.Audio(value = "output/melody.wav", label="Melody audio")
-    generate_btn.click(fn=generate_symbol, inputs=melody_length, outputs=[melody_image, melody_audio])
+      add_symbol_btn.click(fn=add_symbol, inputs=[symbol, duration], outputs=seed_melody)
+      clear_symbol_btn.click(fn = clear_symbol, outputs=seed_melody)
+  
+  with gr.Box():
+    with gr.Column():
+      with gr.Row():
+        melody_length = gr.Slider(minimum=100, maximum=1000, label="Melody length")
+        generate_btn = gr.Button(value="Generate melody")
+      
+      with gr.Row():
+        melody_image = gr.Image(label="Melody sheet")
+        melody_audio = gr.Audio(value = "output/melody.wav", label="Melody audio")
+      generate_btn.click(fn=generate_symbol, inputs=melody_length, outputs=[melody_image, melody_audio])
 
 music_generation.launch(share=True)
