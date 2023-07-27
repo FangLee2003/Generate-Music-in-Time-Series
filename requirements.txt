@@ -4,6 +4,7 @@ tensorflow
 matplotlib
 fluidsynth
 midi2audio
-musescore3
+musescore
+IPython
 tensorflow-cpu
 gradio
