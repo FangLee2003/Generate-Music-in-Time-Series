@@ -1,0 +1,9 @@
+music21
+numpy
+tensorflow
+matplotlib
+fluidsynth
+midi2audio
+musescore3
+tensorflow-cpu
+gradio
