@@ -133,7 +133,7 @@ def save_melody(melody, save_melody_path, step_duration=0.25, format="midi"):
 
   stream.write(format, save_melody_path)
   print("\nMelody sheet:\n")
-  stream.show("./melody.png")
+  stream.show("./output/melody.png")
   
 def play_melody(melody_path):
   audio_path = melody_path[:-3] + 'wav'
