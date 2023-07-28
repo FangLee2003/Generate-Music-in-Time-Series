@@ -37,8 +37,9 @@ import gradio as gr
 
 mapping_path = "./mapping.json"
 save_model_path = "./model/cpu_model.h5"
-save_melody_path = "./melody.mid"
-
+output_midi_path = "./output/melody.mid"
+output_audio_path = "./output/melody.wav"
+output_image_path = "./output/melody.png"
 sequence_length = 64
 
 # durations are expressed in quarter length
@@ -69,7 +70,7 @@ def convert_songs_to_int(dictionary, songs):
 
     return int_songs
 
-def generate_melody(seed, max_sequence_length, song_length, num_classes):
+def generate_melody(seed, max_sequence_length, song_length, dictionary):
   melody = seed.split()
   seed = convert_songs_to_int(dictionary, seed)
   model = keras.models.load_model(save_model_path)
@@ -81,7 +82,7 @@ def generate_melody(seed, max_sequence_length, song_length, num_classes):
   """
   for _ in range(song_length):
     seed = seed[-max_sequence_length:] # Example: seed[-10:] means get the last 10 elements
-    onehot_seed = keras.utils.to_categorical(seed, num_classes=num_classes) # one-hot encode the sequences
+    onehot_seed = keras.utils.to_categorical(seed, num_classes=len(dictionary)) # one-hot encode the sequences
 
     onehot_seed = onehot_seed[np.newaxis,...]  # add new axis to onehot_seed matrix. shape = (64, 28) -> (1, 64, 28)
     """ Because Keras expects a batch of samples, so we have to use 3-dimensional array although there is only one 2-dimensional element.
@@ -93,7 +94,7 @@ def generate_melody(seed, max_sequence_length, song_length, num_classes):
 
     max_probability = max(probabilitites) # get the max probability
     max_probability_index = probabilitites.argmax() # get the index of max probability
-    predicted_symbol = dictionary[max_probability_index]
+    predicted_symbol = list(dictionary.keys())[max_probability_index]
     print("Predicted symbol:", predicted_symbol, "\nProbability:", max_probability)
 
     seed.append(max_probability_index)
@@ -106,7 +107,7 @@ def generate_melody(seed, max_sequence_length, song_length, num_classes):
 
   return melody
 
-def save_melody(melody, save_melody_path, step_duration=0.25, format="midi"):
+def save_melody(melody, midi_path, image_path, step_duration=0.25):
   stream = m21.stream.Stream()
 
   pre_symbol = None
@@ -131,25 +132,26 @@ def save_melody(melody, save_melody_path, step_duration=0.25, format="midi"):
 
       pre_symbol = symbol
 
-  stream.write(format, save_melody_path)
+  stream.write("midi", midi_path)
+  m21.converter.parse(midi_path).write("musicxml.png") # lily.png , image_path
+
   print("\nMelody sheet:\n")
-  stream.show("./output/melody.png")
+  stream.show()
   
-def play_melody(melody_path):
-  audio_path = melody_path[:-3] + 'wav'
+def play_melody(melody_path, audio_path):
   FluidSynth("./sounds/sf2/FluidR3_GM.sf2", 16000).midi_to_audio(melody_path, audio_path)
   print("\nPlay melody.wav:\n")
   display(Audio(audio_path, rate=16000))
 
-seed = ""
+seed = "60 _ _ _ _ 62 _ _ _ _ 64 _ _ _ _ 65 _ _ _ _ 67 _ _ _ _ "
 
 symbol_pitch_list = ["r"]
 name_pitch_list = ["Rest"]
 
 for x in dictionary:
     if x.isdigit():
-        symbol_pitch_list.append(x) 
-        name_pitch_list.append(m21.note.Note(int(x)).nameWithOctave)
+      symbol_pitch_list.append(x) 
+      name_pitch_list.append(m21.note.Note(int(x)).nameWithOctave)
 
 def add_symbol(symbol, duration):
     global seed 
@@ -167,11 +169,13 @@ def clear_symbol():
     seed = ""
 
 def generate_symbol(melody_length):
-    melody = generate_melody(seed, sequence_length, melody_length, len(dictionary))
+    melody = generate_melody(seed, sequence_length, melody_length, dictionary)
     print("\nMelody symbols:", melody)
-    save_melody(melody, save_melody_path)
-    play_melody(save_melody_path)
-    return "./output/melody.png", "./output/melody.wav"
+
+    save_melody(melody, output_midi_path, output_image_path)
+    play_melody(output_midi_path, output_audio_path)
+    
+    return output_image_path, output_audio_path
 
 with gr.Blocks(title="Generate music in time series") as music_generation:
   gr.Markdown("""
@@ -183,7 +187,7 @@ with gr.Blocks(title="Generate music in time series") as music_generation:
         symbol = gr.Dropdown(choices = name_pitch_list, label="Pitch of note")
         duration = gr.Dropdown(choices = acceptable_durations, label="Duration of note")
       
-      seed_melody = gr.Textbox(value = "60 _ _ _ _ 62 _ _ _ _ 64 _ _ _ _ 65 _ _ _ _ 67 _ _ _ _ ",label="Seed melody")
+      seed_melody = gr.Textbox(value = seed, label="Seed melody")
 
       with gr.Row():
         add_symbol_btn = gr.Button(value="Add symbol")
