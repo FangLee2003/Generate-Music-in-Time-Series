@@ -35,7 +35,7 @@ import gradio as gr
 # MUSIC_GENRE = st.selectbox("Please choose your favorite music genre", (os.listdir("./raw_dataset/deutschl")))   
 # KERN_DATASET_PATH = "./raw_dataset/deutschl/" + MUSIC_GENRE
 
-m21.environment.set('musescoreDirectPNGPath', 'C:\\Program Files\\MuseScore 3\\bin\\MuseScore3.exe')
+# m21.environment.set('musescoreDirectPNGPath', 'C:\\Program Files\\MuseScore 3\\bin\\MuseScore3.exe')
 
 mapping_path = "./mapping.json"
 save_model_path = "./model/cpu_model.h5"
