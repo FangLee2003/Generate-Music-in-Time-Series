@@ -199,7 +199,7 @@ with gr.Blocks(title="Generate music in time series") as music_generation:
         generate_btn = gr.Button(value="Generate melody")
       
       with gr.Row():
-        melody_image = gr.Image(label="Melody sheet")
+        melody_image = gr.Image(value = "output/melody.png", label="Melody sheet")
         melody_audio = gr.Audio(value = "output/melody.wav", label="Melody audio")
       generate_btn.click(fn=generate_symbol, inputs=melody_length, outputs=[melody_image, melody_audio])
 
