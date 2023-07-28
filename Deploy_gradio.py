@@ -35,11 +35,14 @@ import gradio as gr
 # MUSIC_GENRE = st.selectbox("Please choose your favorite music genre", (os.listdir("./raw_dataset/deutschl")))   
 # KERN_DATASET_PATH = "./raw_dataset/deutschl/" + MUSIC_GENRE
 
+m21.environment.set('musescoreDirectPNGPath', 'C:\\Program Files\\MuseScore 3\\bin\\MuseScore3.exe')
+
 mapping_path = "./mapping.json"
 save_model_path = "./model/cpu_model.h5"
 output_midi_path = "./output/melody.mid"
 output_audio_path = "./output/melody.wav"
 output_image_path = "./output/melody.png"
+
 sequence_length = 64
 
 # durations are expressed in quarter length
@@ -133,13 +136,12 @@ def save_melody(melody, midi_path, image_path, step_duration=0.25):
       pre_symbol = symbol
 
   stream.write("midi", midi_path)
-  m21.converter.parse(midi_path).show("musicxml.png") # musicxml.png, lily.png , image_path
 
   print("\nMelody sheet:\n")
-  stream.show()
+  stream.show(fmt="musicxml.png", fp = output_image_path) # fmt: format, fp: file path
   
 def play_melody(melody_path, audio_path):
-  FluidSynth("./sounds/sf2/FluidR3_GM.sf2", 16000).midi_to_audio(melody_path, audio_path)
+  FluidSynth("./sounds/sf2/default-GM.sf2", 16000).midi_to_audio(melody_path, audio_path)
   print("\nPlay melody.wav:\n")
   display(Audio(audio_path, rate=16000))
 
@@ -175,7 +177,7 @@ def generate_symbol(melody_length):
     save_melody(melody, output_midi_path, output_image_path)
     play_melody(output_midi_path, output_audio_path)
     
-    return output_image_path, output_audio_path
+    return "./output/melody-1.png", output_audio_path
 
 with gr.Blocks(title="Generate music in time series") as music_generation:
   gr.Markdown("""
@@ -203,8 +205,9 @@ with gr.Blocks(title="Generate music in time series") as music_generation:
         generate_btn = gr.Button(value="Generate melody")
       
       with gr.Row():
-        melody_image = gr.Image(value = "output/melody.png", label="Melody sheet")
-        melody_audio = gr.Audio(value = "output/melody.wav", label="Melody audio")
+        melody_image = gr.Image(label="Melody sheet")
+        melody_audio = gr.Audio(label="Melody audio")
+
       generate_btn.click(fn=generate_symbol, inputs=melody_length, outputs=[melody_image, melody_audio])
 
 music_generation.launch()
