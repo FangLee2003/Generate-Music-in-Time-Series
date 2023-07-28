@@ -133,7 +133,7 @@ def save_melody(melody, midi_path, image_path, step_duration=0.25):
       pre_symbol = symbol
 
   stream.write("midi", midi_path)
-  m21.converter.parse(midi_path).write("musicxml.png") # lily.png , image_path
+  m21.converter.parse(midi_path).show("musicxml.png") # musicxml.png, lily.png , image_path
 
   print("\nMelody sheet:\n")
   stream.show()
@@ -207,4 +207,4 @@ with gr.Blocks(title="Generate music in time series") as music_generation:
         melody_audio = gr.Audio(value = "output/melody.wav", label="Melody audio")
       generate_btn.click(fn=generate_symbol, inputs=melody_length, outputs=[melody_image, melody_audio])
 
-music_generation.launch(share=True)
+music_generation.launch()
