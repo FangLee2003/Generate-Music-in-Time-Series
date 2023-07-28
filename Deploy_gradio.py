@@ -141,7 +141,7 @@ def save_melody(melody, midi_path, image_path, step_duration=0.25):
   stream.show(fmt="musicxml.png", fp = output_image_path) # fmt: format, fp: file path
   
 def play_melody(melody_path, audio_path):
-  FluidSynth("./sounds/sf2/default-GM.sf2", 16000).midi_to_audio(melody_path, audio_path)
+  FluidSynth(sound_font="./sounds/sf2/default-GM.sf2", sample_rate=16000).midi_to_audio(melody_path, audio_path)
   print("\nPlay melody.wav:\n")
   display(Audio(audio_path, rate=16000))
 
