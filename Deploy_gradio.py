@@ -145,7 +145,7 @@ def play_melody(melody_path, audio_path):
   print("\nPlay melody.wav:\n")
   display(Audio(audio_path, rate=16000))
 
-seed = "60 _ _ _ _ 62 _ _ _ _ 64 _ _ _ _ 65 _ _ _ _ 67 _ _ _ _ "
+seed = "67 _ 67 _ 67 _ _ 65 64 _ 64 _ 64 _ _"
 
 symbol_pitch_list = ["r"]
 name_pitch_list = ["Rest"]
@@ -161,7 +161,7 @@ def add_symbol(symbol, duration):
     
     duration = float(duration)
     if duration > 0.25:
-        for i in range(int(duration/0.25)):
+        for i in range(int((duration-0.25)/0.25)):
             seed += "_ "
 
     return seed
